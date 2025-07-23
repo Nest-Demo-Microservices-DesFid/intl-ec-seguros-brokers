@@ -3,6 +3,7 @@ import { CreateBrokerDto } from './dto/create-broker.dto';
 import { UpdateBrokerDto } from './dto/update-broker.dto';
 import { PrismaClient } from '@prisma/client';
 import { PaginationDto } from 'src/common';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class BrokersService extends PrismaClient implements OnModuleInit {
@@ -20,7 +21,7 @@ export class BrokersService extends PrismaClient implements OnModuleInit {
   async findAll(paginationDto: PaginationDto) {
     const {page, limit} = paginationDto;
     const totalCount = await this.broker.count();
-    const lastPage = Math.ceil(totalCount/limit);
+    const totalPages = Math.ceil(totalCount/limit);
     return {
       data: await this.broker.findMany({
       skip: (page - 1) * limit,
@@ -30,7 +31,7 @@ export class BrokersService extends PrismaClient implements OnModuleInit {
     meta: {
       page,
       total: totalCount,
-      lastPage
+      totalPages
     }
     };
   }
@@ -40,7 +41,11 @@ export class BrokersService extends PrismaClient implements OnModuleInit {
       where: {id, isActive: true}
     })
     if (!brokerFound) {
-      throw new NotFoundException(`Broker with id ${id} not found.`);
+      throw new RpcException({
+        statusCode: 404,
+        message: `Broker with id ${id} not found`,
+        error: 'Not Found'  
+      });
     }
     return brokerFound
   }

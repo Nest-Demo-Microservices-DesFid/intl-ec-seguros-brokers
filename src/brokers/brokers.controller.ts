@@ -16,26 +16,26 @@ export class BrokersController {
   }
 
   // @Get()
-  @MessagePattern({cmd: 'find_all_broker'})
+  @MessagePattern({cmd: 'find_all_brokers'})
   findAll(@Payload() paginationDto: PaginationDto) {
     return this.brokersService.findAll(paginationDto);
   }
 
   // @Get(':id')
   @MessagePattern({cmd: 'find_one_broker'})
-  findOne(@Payload('id', ParseIntPipe) id: number) {
+  findBrokerById(@Payload('id', ParseIntPipe) id: number) {
     return this.brokersService.findOne(id);
   }
 
   // @Patch(':id')
   @MessagePattern({cmd: 'update_broker'})
-  update(@Payload() updateBrokerDto: UpdateBrokerDto) {
+  patchBroker(@Payload() updateBrokerDto: UpdateBrokerDto) {
     return this.brokersService.update(updateBrokerDto.id, updateBrokerDto);
   }
 
   // @Delete(':id')
   @MessagePattern({cmd: 'delete_broker'})
-  remove(@Payload('id') id: string) {
-    return this.brokersService.remove(+id);
+  remove(@Payload('id', ParseIntPipe) id: number) {
+    return this.brokersService.remove(id);
   }
 }
